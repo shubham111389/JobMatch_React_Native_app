@@ -42,5 +42,6 @@ const Home =()=>{
         </View>
       </ScrollView>
     </SafeAreaView>
+    )
 }
 export default Home;
