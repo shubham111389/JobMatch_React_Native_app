@@ -1,58 +1,70 @@
 import { useState } from "react";
-import { SafeAreaView, ScrollView, View } from "react-native";
-import { Stack, useRouter } from "expo-router";
-
-import { COLORS, icons, images, SIZES } from "../../../constants";
 import {
-  Nearbyjobs,
-  Popularjobs,
-  ScreenHeaderBtn,
-  Welcome,
-} from "../../../components";
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  FlatList,
+} from "react-native";
+import { useRouter } from "expo-router";
 
-const Home = () => {
-  const router = useRouter()
-  const [searchTerm, setSearchTerm] = useState("");
+import styles from "./welcome.style";
+import { icons, SIZES } from "../../../constants";
+
+const jobTypes = ["Full-time", "Part-time", "Contractor"];
+
+const Welcome = ({ searchTerm, setSearchTerm, handleClick }) => {
+  const router = useRouter();
+  const [activeJobType, setActiveJobType] = useState("Full-time");
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.lightWhite }}>
-      <Stack.Screen
-        options={{
-          headerStyle: { backgroundColor: COLORS.lightWhite },
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <ScreenHeaderBtn iconUrl={icons.menu} dimension='60%' />
-          ),
-          headerRight: () => (
-            <ScreenHeaderBtn iconUrl={images.profile} dimension='100%' />
-          ),
-          headerTitle: "",
-        }}
-      />
+    <View>
+      <View style={styles.container}>
+        <Text style={styles.userName}>Hello Shubham</Text>
+        <Text style={styles.welcomeMessage}>Find your perfect job</Text>
+      </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View
-          style={{
-            flex: 1,
-            padding: SIZES.medium,
-          }}
-        >
-          <Welcome
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            handleClick={() => {
-              if (searchTerm) {
-                router.push(`/search/${searchTerm}`)
-              }
-            }}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchWrapper}>
+          <TextInput
+            style={styles.searchInput}
+            value={searchTerm}
+            onChangeText={(text) => setSearchTerm(text)}
+            placeholder='What are you looking for?'
           />
-
-          <Popularjobs />
-          <Nearbyjobs />
         </View>
-      </ScrollView>
-    </SafeAreaView>
+
+        <TouchableOpacity style={styles.searchBtn} onPress={handleClick}>
+          <Image
+            source={icons.search}
+            resizeMode='contain'
+            style={styles.searchBtnImage}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.tabsContainer}>
+        <FlatList
+          data={jobTypes}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.tab(activeJobType, item)}
+              onPress={() => {
+                setActiveJobType(item);
+                router.push(`/search/${item}`);
+              }}
+            >
+              <Text style={styles.tabText(activeJobType, item)}>{item}</Text>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item}
+          contentContainerStyle={{ columnGap: SIZES.small }}
+          horizontal
+        />
+      </View>
+    </View>
   );
 };
 
-export default Home;
+export default Welcome;
